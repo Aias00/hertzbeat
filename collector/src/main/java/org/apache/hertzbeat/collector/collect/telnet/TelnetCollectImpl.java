@@ -44,17 +44,16 @@ import org.apache.hertzbeat.common.util.CommonUtil;
 @Slf4j
 public class TelnetCollectImpl extends AbstractCollect {
 
-    public TelnetCollectImpl(){}
+    @Override
+    public void preCheck(Metrics metrics) throws IllegalArgumentException {
+        if (metrics == null || metrics.getTelnet() == null) {
+            throw new IllegalArgumentException("Telnet collect must has Telnet params");
+        }
+    }
 
     @Override
     public void collect(CollectRep.MetricsData.Builder builder, long monitorId, String app, Metrics metrics) {
         long startTime = System.currentTimeMillis();
-        if (metrics == null || metrics.getTelnet() == null) {
-            builder.setCode(CollectRep.Code.FAIL);
-            builder.setMsg("Telnet collect must has telnet params");
-            return;
-        }
-
         TelnetProtocol telnet = metrics.getTelnet();
         int timeout = CollectUtil.getTimeout(telnet.getTimeout());
         TelnetClient telnetClient = null;

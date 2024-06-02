@@ -22,7 +22,6 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoServerUnavailableException;
 import com.mongodb.MongoTimeoutException;
-import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
@@ -85,15 +84,21 @@ public class MongodbSingleCollectImpl extends AbstractCollect {
         connectionCommonCache = new ConnectionCommonCache<>();
     }
 
+    /**
+     * Check that the mongodb connection information in metrics is complete
+     */
+    public void preCheck(Metrics metrics) throws IllegalArgumentException{
+        Assert.isTrue(metrics != null && metrics.getMongodb() != null, "Mongodb collect must has mongodb params");
+        MongodbProtocol mongodbProtocol = metrics.getMongodb();
+        Assert.hasText(mongodbProtocol.getCommand(), "Mongodb Protocol command is required.");
+        Assert.hasText(mongodbProtocol.getHost(), "Mongodb Protocol host is required.");
+        Assert.hasText(mongodbProtocol.getPort(), "Mongodb Protocol port is required.");
+        Assert.hasText(mongodbProtocol.getUsername(), "Mongodb Protocol username is required.");
+        Assert.hasText(mongodbProtocol.getPassword(), "Mongodb Protocol password is required.");
+    }
+
     @Override
     public void collect(CollectRep.MetricsData.Builder builder, long monitorId, String app, Metrics metrics) {
-        try {
-            preCheck(metrics);
-        } catch (Exception e) {
-            builder.setCode(CollectRep.Code.FAIL);
-            builder.setMsg(e.getMessage());
-            return;
-        }
         // The command naming convention is the command supported by the above mongodb diagnostic. Support subdocument
         // If the command does not include., execute the command directly and use the document it returns;
         // otherwise, you need to execute the metricsParts[0] command first and then obtain the related subdocument
@@ -106,23 +111,16 @@ public class MongodbSingleCollectImpl extends AbstractCollect {
             builder.setMsg("unsupported mongodb diagnostic command: " + command);
             return;
         }
-        ClientSession clientSession = null;
         MongoClient mongoClient;
         CacheIdentifier identifier = null;
         try {
             identifier = getIdentifier(metrics.getMongodb());
             mongoClient = getClient(metrics, identifier);
             MongoDatabase mongoDatabase = mongoClient.getDatabase(metrics.getMongodb().getDatabase());
-            clientSession = mongoClient.startSession();
             CollectRep.ValueRow.Builder valueRowBuilder = CollectRep.ValueRow.newBuilder();
-            Document document;
-            if (metricsParts.length == 1) {
-                document = mongoDatabase.runCommand(clientSession, new Document(command, 1));
-            } else {
-                document = mongoDatabase.runCommand(clientSession, new Document(command, 1));
-                for (int i = 1; i < metricsParts.length; i++) {
-                    document = (Document) document.get(metricsParts[i]);
-                }
+            Document document = mongoDatabase.runCommand(new Document(command, 1));
+            for (int i = 1; i < metricsParts.length; i++) {
+                document = (Document) document.get(metricsParts[i]);
             }
             if (document == null) {
                 throw new RuntimeException("the document get from command " + metrics.getMongodb().getCommand() + " is null.");
@@ -139,12 +137,6 @@ public class MongodbSingleCollectImpl extends AbstractCollect {
             String message = CommonUtil.getMessageFromThrowable(e);
             builder.setMsg(message);
             log.warn(message, e);
-        } finally {
-            if (clientSession != null) {
-                try {
-                    clientSession.close();
-                } catch (Exception ignored) {}
-            }
         }
     }
 
@@ -169,19 +161,6 @@ public class MongodbSingleCollectImpl extends AbstractCollect {
                 valueRowBuilder.addColumns(CommonConstants.NULL_VALUE);
             }
         });
-    }
-
-    /**
-     * Check that the mongodb connection information in metrics is complete
-     */
-    private void preCheck(Metrics metrics) {
-        Assert.isTrue(metrics != null && metrics.getMongodb() != null, "Mongodb collect must has mongodb params");
-        MongodbProtocol mongodbProtocol = metrics.getMongodb();
-        Assert.hasText(mongodbProtocol.getCommand(), "Mongodb Protocol command is required.");
-        Assert.hasText(mongodbProtocol.getHost(), "Mongodb Protocol host is required.");
-        Assert.hasText(mongodbProtocol.getPort(), "Mongodb Protocol port is required.");
-        Assert.hasText(mongodbProtocol.getUsername(), "Mongodb Protocol username is required.");
-        Assert.hasText(mongodbProtocol.getPassword(), "Mongodb Protocol password is required.");
     }
 
     public static CacheIdentifier getIdentifier(MongodbProtocol mongodbProtocol){

@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.hertzbeat.common.entity.job.Configmap;
 import org.apache.hertzbeat.common.entity.job.Metrics;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,14 +40,6 @@ import org.junit.jupiter.api.Test;
 class CollectUtilTest {
 
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
 
     @Test
     void countMatchKeyword() {
@@ -86,6 +76,11 @@ class CollectUtilTest {
         assertNotNull(res3);
         assertEquals(0, res3.getValue());
         assertEquals("KB", res3.getUnit());
+
+        CollectUtil.DoubleAndUnit res4 = CollectUtil.extractDoubleAndUnitFromStr("GRAPH0");
+        assertNull(res4.getValue());
+        assertNull(res4.getUnit());
+
     }
 
 
@@ -140,7 +135,6 @@ class CollectUtilTest {
         Metrics metricsTarget = Metrics.builder().name("张三").build();
         JsonElement jsonElement2 = new Gson().toJsonTree(metricsTarget);
         assertEquals(JSON_MAPPER.readTree(jsonElement2.toString()), JSON_MAPPER.readTree(res.toString()));
-
 
         List<Metrics> metricsList = new ArrayList<>();
         metricsList.add(metrics);

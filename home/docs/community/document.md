@@ -78,9 +78,9 @@ This website is compiled using node, using Docusaurus framework components
 
 ### Naming convention of  files
 
-All lowercase, separated by a dash
+Consist entirely of lowercase letters, numbers, underscores, and dashes.
 
-Positive example: `render-dom.js / signup.css / index.html / company-logo.png`
+Positive example: `render-dom.js / signup.css / index.html / company-logo.png / hertz_beat.md`
 
 Counter example: `renderDom.js / UserManagement.html`
 
@@ -94,8 +94,4 @@ css and other style files are placed in the `src/css` directory
 
 > All pages doc can be directly jumped to the corresponding github resource modification page through the 'Edit this page' button at the bottom
 
-### Page style modification
-
-Visit the page https://hertzbeat.apache.org/
-位于 `src/pages/components`
 

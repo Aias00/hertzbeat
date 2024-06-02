@@ -78,9 +78,9 @@ git clone git@github.com:<your-github-user-name>/hertzbeat.git
 
 ### 文件的命名规范
 
-全部小写，由破折号分隔。
+全部由小写，数字，下划线和破折号组成。
 
-正例：`render-dom.js / signup.css / index.html / company-logo.png`
+正例：`render-dom.js / signup.css / index.html / company-logo.png / hertz_beat.md`
 
 反例：`renderDom.js / UserManagement.html`
 
@@ -93,8 +93,3 @@ css 和其他样式文件放在 `src/css` 目录中。
 ### 页面内容修改
 
 > 所有页面文档都可以通过底部的'编辑此页面'按钮直接跳转到相应的 github 资源修改页面。
-
-### 页面样式修改
-
-访问页面 https://hertzbeat.apache.org/
-位于 `src/pages/components`
