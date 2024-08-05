@@ -105,27 +105,17 @@ metrics:
     # collect metrics content
     fields:
       # field-metric name, type-metric type(0-number,1-string), unit-metric unit('%','ms','MB'), label-whether it is a metrics label field
-      - field: server_version
+      - field: crdb_version
         type: 1
         label: true
         i18n:
           zh-CN: 服务器版本
           en-US: Server Version
-      - field: port
-        type: 1
-        i18n:
-          zh-CN: 端口
-          en-US: Port
       - field: server_encoding
         type: 1
         i18n:
           zh-CN: 服务器编码
           en-US: Server Encoding
-      - field: data_directory
-        type: 1
-        i18n:
-          zh-CN: 数据目录
-          en-US: Data Directory
       - field: max_connections
         type: 0
         i18n:
@@ -147,63 +137,42 @@ metrics:
       # SQL Query Method：oneRow, multiRow, columns
       queryType: columns
       # sql
-      sql: select name, setting as value from pg_settings where name = 'max_connections' or name = 'server_version' or name = 'server_encoding' or name = 'port' or name = 'data_directory';
+      sql: select name, setting as value from pg_settings where name = 'max_connections' or name = 'crdb_version' or name = 'server_encoding' ;
       # JDBC url
       url: ^_^url^_^
 
-  - name: state
+  - name: system resource
     i18n:
-      zh-CN: 状态信息
-      en-US: State Info
+      zh-CN: 系统资源
+      en-US: System Resource
     priority: 1
     fields:
-      - field: db_name
-        type: 1
+      - field: sys_cpu_user_percent
+        type: 0
         label: true
         i18n:
-          zh-CN: 数据库名称
-          en-US: Database Name
-      - field: conflicts
+          zh-CN: CPU 用户使用率
+          en-US: CPU User Usage
+      - field: sys_cpu_sys_percent
         type: 0
-        unit: times
         i18n:
-          zh-CN: 冲突次数
-          en-US: Conflicts
-      - field: deadlocks
+          zh-CN: CPU 系统使用率
+          en-US: CPU System Usage
+      - field: sql_mem_conns_current
         type: 0
-        unit: times
         i18n:
-          zh-CN: 死锁次数
-          en-US: Deadlocks
-      - field: blks_read
+          zh-CN: 当前连接占用内存
+          en-US: Current Connection Memory
+      - field: sql_mem_sql_max_count
         type: 0
-        unit: blocks per second
         i18n:
-          zh-CN: 读取块
-          en-US: Blocks Read
-      - field: blks_hit
+          zh-CN: SQL 最大内存
+          en-US: SQL Max Memory
+      - field: sys_rss
         type: 0
-        unit: blocks per second
         i18n:
-          zh-CN: 命中块
-          en-US: Blocks Hit
-      - field: blk_read_time
-        type: 0
-        unit: ms
-        i18n:
-          zh-CN: 读取时间
-          en-US: Read Time
-      - field: blk_write_time
-        type: 0
-        unit: ms
-        i18n:
-          zh-CN: 写入时间
-          en-US: Write Time
-      - field: stats_reset
-        type: 1
-        i18n:
-          zh-CN: 统计重置
-          en-US: Stats Reset
+          zh-CN: 进程的常驻集大小
+          en-US: Resident Set Size
     protocol: jdbc
     jdbc:
       host: ^_^host^_^
@@ -214,7 +183,17 @@ metrics:
       password: ^_^password^_^
       database: ^_^database^_^
       queryType: multiRow
-      sql: SELECT COALESCE(datname,'shared-object') as db_name, conflicts, deadlocks, blks_read, blks_hit, blk_read_time, blk_write_time, stats_reset from pg_stat_database where (datname != 'template1' and datname != 'template0') or datname is null;
+      sql: |
+        SELECT
+          MAX(CASE WHEN name = 'sys.cpu.user.percent' THEN value END) AS sys_cpu_user_percent,
+          MAX(CASE WHEN name = 'sys.cpu.sys.percent' THEN value END) AS sys_cpu_sys_percent,
+          MAX(CASE WHEN name = 'sql.mem.conns.current' THEN value END) AS sql_mem_conns_current,
+          MAX(CASE WHEN name = 'sql.mem.sql.max-count' THEN value END) AS sql_mem_sql_max_count,
+          MAX(CASE WHEN name = 'sys.rss' THEN value END) AS sys_rss
+        FROM
+          crdb_internal.node_metrics
+        WHERE
+          name IN ('sys.cpu.user.percent', 'sys.cpu.sys.percent', 'sql.mem.conns.current', 'sql.mem.sql.max-count', 'sys.rss');
       url: ^_^url^_^
 
   - name: activity
