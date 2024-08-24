@@ -31,7 +31,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Send alarm information by Slack Webhook
@@ -41,7 +40,6 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 final class SlackAlertNotifyHandlerImpl extends AbstractAlertNotifyHandlerImpl {
     private static final String SUCCESS = "ok";
-    private final RestTemplate restTemplate;
 
     @Override
     public void send(NoticeReceiver receiver, NoticeTemplate noticeTemplate, Alert alert) throws AlertNoticeException {

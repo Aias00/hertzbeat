@@ -34,7 +34,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * WeChat app alert notify impl
@@ -58,8 +57,7 @@ public class WeComAppAlertNotifyHandlerImpl extends AbstractAlertNotifyHandlerIm
      * app message send object
      */
     private static final String DEFAULT_ALL = "@all";
-
-    private final RestTemplate restTemplate;
+    
 
     @Override
     public void send(NoticeReceiver receiver, NoticeTemplate noticeTemplate, Alert alert) throws AlertNoticeException {

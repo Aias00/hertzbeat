@@ -23,7 +23,7 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    
     <artifactId>hertzbeat-collector</artifactId>
     <name>${project.artifactId}</name>
     <properties>
@@ -31,7 +31,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
     </properties>
-
+    
     <dependencies>
         <!-- spring -->
         <dependency>
@@ -109,7 +109,7 @@
             <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
         </dependency>
-
+        
         <!-- dm -->
         <dependency>
             <groupId>com.dameng</groupId>
@@ -163,21 +163,21 @@
             <artifactId>snmp4j</artifactId>
             <version>${snmp4j.version}</version>
         </dependency>
-
+        
         <!-- rocketmq -->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-tools</artifactId>
             <version>${rocketmq-tools.version}</version>
         </dependency>
-
+        
         <!--dns-->
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
             <version>${dnsjava.version}</version>
         </dependency>
-
+        
         <!-- consul -->
         <dependency>
             <groupId>com.ecwid.consul</groupId>
@@ -207,12 +207,67 @@
             </exclusions>
         </dependency>
     </dependencies>
-
+    
     <build>
         <finalName>apache-hertzbeat-collector-${hzb.version}</finalName>
     </build>
-
+    
     <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>0.10.2</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <buildArgs>
+                                --no-fallback
+                                --initialize-at-build-time=org.apache.commons.logging.LogFactory
+                                --initialize-at-build-time=org.apache.commons.logging.LogFactoryService
+                                --initialize-at-build-time=org.slf4j.MDC
+                                --initialize-at-build-time=ch.qos.logback.classic.Level
+                                --initialize-at-build-time=ch.qos.logback.classic.Logger
+                                --initialize-at-build-time=ch.qos.logback.core.util.StatusPrinter
+                                --initialize-at-build-time=ch.qos.logback.core.status.StatusBase
+                                --initialize-at-build-time=ch.qos.logback.core.status.InfoStatus
+                                --initialize-at-build-time=ch.qos.logback.core.spi.AppenderAttachableImpl
+                                --initialize-at-build-time=org.slf4j.LoggerFactory
+                                --initialize-at-build-time=ch.qos.logback.core.util.Loader
+                                --initialize-at-build-time=org.slf4j.impl.StaticLoggerBinder
+                                --initialize-at-build-time=ch.qos.logback.classic.spi.ThrowableProxy
+                                --initialize-at-build-time=ch.qos.logback.core.CoreConstants
+                                --report-unsupported-elements-at-runtime
+                                --allow-incomplete-classpath
+                                -H:+ReportExceptionStackTraces
+                            </buildArgs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>inner</id>
             <build>
