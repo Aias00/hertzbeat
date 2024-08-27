@@ -216,6 +216,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>native-image-support</artifactId>
+            <version>0.9.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -311,6 +317,37 @@
                                 --initialize-at-build-time=org.slf4j.impl.StaticLoggerBinder
                                 --initialize-at-build-time=ch.qos.logback.classic.spi.ThrowableProxy
                                 --initialize-at-build-time=ch.qos.logback.core.CoreConstants
+                                <!-- Runtime Hints -->
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.util.AbstractReferenceCounted
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.PemPrivateKey
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.PooledByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.PooledUnsafeDirectByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledHeapByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.ByteBufUtil
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.PooledByteBufAllocator
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledDirectByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledUnsafeDirectByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.PooledSlicedByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.AbstractPooledDerivedByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledByteBufAllocator$InstrumentedUnpooledUnsafeDirectByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.AbstractReferenceCountedByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.ByteBufAllocator
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.PemValue
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.PemEncoded
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.PemX509Certificate
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.PemPrivateKey
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.BouncyCastleAlpnSslUtils
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.util.AbstractReferenceCounted
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledHeapByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.AbstractPooledDerivedByteBuf
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.channel.DefaultFileRegion
+                                --initialize-at-run-time=com.oracle.svm.core.util.UserError$UserException
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.internal.tcnative.CertificateCompressionAlgo
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.internal.tcnative.AsyncSSLPrivateKeyMethod
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.OpenSslAsyncPrivateKeyMethod
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.internal.tcnative.CertificateCompressionAlgo
+                                --initialize-at-run-time=io.grpc.netty.shaded.io.netty.handler.ssl.OpenSslPrivateKeyMethod
+                                --initialize-at-build-time=com.sun.management.internal.HotSpotDiagnostic
                                 --report-unsupported-elements-at-runtime
                                 --allow-incomplete-classpath
                                 -H:+ReportExceptionStackTraces

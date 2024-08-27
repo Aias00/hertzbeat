@@ -32,6 +32,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -81,7 +82,8 @@ class WeComAppAlertNotifyHandlerImplTest {
 		alert.setLastAlarmTime(System.currentTimeMillis());
 		alert.setContent("This is a test alert.");
 
-		weComAppAlertNotifyHandler = new WeComAppAlertNotifyHandlerImpl(restTemplate);
+		weComAppAlertNotifyHandler = new WeComAppAlertNotifyHandlerImpl();
+		ReflectionTestUtils.setField(weComAppAlertNotifyHandler, "restTemplate", restTemplate);
 	}
 
 	@Test
